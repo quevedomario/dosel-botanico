@@ -37,16 +37,19 @@ plot(mosaico.botanico)
 
 La **extracción** de partes del mosaico se puede realizar con las distintas funciones `clip`disponibles en **lidR**. A continuación, dos ejemplos; un fragmento circular correspondiente a la Carbayeda, y un rectángulo de datos incluyendo todos los terrenos del Botánico. Las coordenadas son las originales del conjunto de datos, en este caso UTM 30N. En ambos casos la función `plot` muestra y permite rotar e inclinar la nube de puntos:
 
-```{r eval=c(1,3)}
+```{r eval=1}
 carbayeda <- clip_circle(mosaico.botanico, 288115, 4821807, radius = 50)
 plot(carbayeda) 
+```
+
+![](code_lidar_copas_botanico_files/figure-gfm/rgl_carbayeda.png)
+
+```{r eval=1}
 todo.botanico <- clip_rectangle(mosaico.botanico, 287676,4821673, 288937,4822128)  
 plot(todo.botanico, bg="white") 
 ```
 
-![optional caption text](code_lidar_copas_botanico_files/figure-gfm/rgl_carbayeda.png)
-
-![optional caption text](code_lidar_copas_botanico_files/figure-gfm/rgl_todo_botanico.png)
+![](code_lidar_copas_botanico_files/figure-gfm/rgl_todo_botanico.png)
 
 Los autores de la librería **lidR** (enlace arriba) tienen también un visor de nubes de puntos mucho más ágil, si bien a diferencia del estándar requiere cerrar el visor antes de procesar más código R; requiere la instalación de la librería adicional *lidRviewer*:
 
@@ -56,7 +59,7 @@ plot(todo.botanico, backend="lidRviewer") # default = Z
 
 A continuación podemos usar funciones para evaluar la condición general del conjunto de datos. Concretamente `las_check()` repasa diversos indicadores interesantes, entre ellos si los datos están normalizados (elaboro debajo), o si existen muchos puntos duplicados.
 
-```{r lascheck, include=TRUE, echo=3}
+```{r lascheck, echo=TRUE, eval=3}
 las_check(todo.botanico)
 str(todo.botanico@data)
 summary(todo.botanico$Z)
@@ -70,7 +73,7 @@ Hasta el momento el parámetro *Z* en el conjunto de datos recoje la altura de c
 
 Tras normalizar los datos podemos aplicar `las_check` de nuevo, así como repasar la nueva distribución de valores de alturas (Z):
 
-```{r eval = c(1, 3)}
+```{r}
 todo.botanico.norm <- normalize_height(todo.botanico, tin())
 las_check(todo.botanico.norm)
 summary(todo.botanico.norm$Z)
