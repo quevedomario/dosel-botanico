@@ -1,7 +1,7 @@
 Modelos de dosel arbóreo a partir de LiDAR
 ================
 Mario Quevedo
-Febrero 2024
+Marzo 2024
 
 ## Estructura de la vegetación (arbórea y arbustiva) en el [Jardín Botánico Atlántico de Gijón](https://www.gijon.es/es/directorio/jardin-botanico-atlantico-de-gijon)
 
@@ -165,9 +165,9 @@ summary(todo.botanico$Z)
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     ##   11.39   24.68   29.35   29.67   33.35   74.16
 
-*INTERPRETAR SUMMARY!*
+*INTERPRETAR summary()*
 
-## Normalizando alturas de la vegetación
+### Normalizando alturas de la vegetación
 
 Hasta el momento el parámetro *Z* en el conjunto de datos recoje la
 altura de cada punto sobre el nivel del mar. Sin embargo para analizr
@@ -182,7 +182,7 @@ nueva distribución de valores de alturas (Z):
 todo.botanico.norm <- normalize_height(todo.botanico, tin())
 ```
 
-    ## Delaunay rasterization[====================================--------------] 73% (2 threads)Delaunay rasterization[=====================================-------------] 74% (2 threads)Delaunay rasterization[=====================================-------------] 75% (2 threads)Delaunay rasterization[======================================------------] 76% (2 threads)Delaunay rasterization[======================================------------] 77% (2 threads)Delaunay rasterization[=======================================-----------] 78% (2 threads)Delaunay rasterization[=======================================-----------] 79% (2 threads)Delaunay rasterization[========================================----------] 80% (2 threads)Delaunay rasterization[========================================----------] 81% (2 threads)Delaunay rasterization[=========================================---------] 82% (2 threads)Delaunay rasterization[=========================================---------] 83% (2 threads)Delaunay rasterization[==========================================--------] 84% (2 threads)Delaunay rasterization[==========================================--------] 85% (2 threads)Delaunay rasterization[===========================================-------] 86% (2 threads)Delaunay rasterization[===========================================-------] 87% (2 threads)Delaunay rasterization[============================================------] 88% (2 threads)Delaunay rasterization[============================================------] 89% (2 threads)Delaunay rasterization[=============================================-----] 90% (2 threads)Delaunay rasterization[=============================================-----] 91% (2 threads)Delaunay rasterization[==============================================----] 92% (2 threads)Delaunay rasterization[==============================================----] 93% (2 threads)Delaunay rasterization[===============================================---] 94% (2 threads)Delaunay rasterization[===============================================---] 95% (2 threads)Delaunay rasterization[================================================--] 96% (2 threads)Delaunay rasterization[================================================--] 97% (2 threads)Delaunay rasterization[=================================================-] 98% (2 threads)Delaunay rasterization[=================================================-] 99% (2 threads)Delaunay rasterization[==================================================] 100% (2 threads)
+    ## Delaunay rasterization[====================================--------------] 72% (2 threads)Delaunay rasterization[====================================--------------] 73% (2 threads)Delaunay rasterization[=====================================-------------] 74% (2 threads)Delaunay rasterization[=====================================-------------] 75% (2 threads)Delaunay rasterization[======================================------------] 76% (2 threads)Delaunay rasterization[======================================------------] 77% (2 threads)Delaunay rasterization[=======================================-----------] 78% (2 threads)Delaunay rasterization[=======================================-----------] 79% (2 threads)Delaunay rasterization[========================================----------] 80% (2 threads)Delaunay rasterization[========================================----------] 81% (2 threads)Delaunay rasterization[=========================================---------] 82% (2 threads)Delaunay rasterization[=========================================---------] 83% (2 threads)Delaunay rasterization[==========================================--------] 84% (2 threads)Delaunay rasterization[==========================================--------] 85% (2 threads)Delaunay rasterization[===========================================-------] 86% (2 threads)Delaunay rasterization[===========================================-------] 87% (2 threads)Delaunay rasterization[============================================------] 88% (2 threads)Delaunay rasterization[============================================------] 89% (2 threads)Delaunay rasterization[=============================================-----] 90% (2 threads)Delaunay rasterization[=============================================-----] 91% (2 threads)Delaunay rasterization[==============================================----] 92% (2 threads)Delaunay rasterization[==============================================----] 93% (2 threads)Delaunay rasterization[===============================================---] 94% (2 threads)Delaunay rasterization[===============================================---] 95% (2 threads)Delaunay rasterization[================================================--] 96% (2 threads)Delaunay rasterization[================================================--] 97% (2 threads)Delaunay rasterization[=================================================-] 98% (2 threads)Delaunay rasterization[=================================================-] 99% (2 threads)Delaunay rasterization[==================================================] 100% (2 threads)
 
 ``` r
 las_check(todo.botanico.norm)
@@ -249,9 +249,9 @@ todo.botanico.norm <- filter_poi(todo.botanico.norm, Z >= 0)
 plot(todo.botanico.norm, bg = "white", backend="lidRviewer")
 ```
 
-## Modelo de alturas del dosel
+### Modelo de alturas del dosel
 
-*using point-to-raster algorithm *
+*p2r*
 
 ``` r
 dosel.modelo1 <- rasterize_canopy(todo.botanico.norm, res=1, p2r(subcircle = 0.2), pkg="terra")
@@ -278,10 +278,10 @@ plot(dosel.modelo1.suavizado, col = height.colors(50))
 terra::writeRaster(dosel.modelo1.suavizado, "dosel.modelo1.tif", overwrite=T)
 ```
 
-## Detección de árboles
+### Detección de árboles
 
-*based on local maximum filter applied to CHM* mayor valor de `ws=`
-menor número de árboles individualizados
+*lmf 2 chm* Mayor valor de `ws=` menor número de árboles
+individualizados
 
 ``` r
 copas.p2r.02 <- locate_trees(dosel.modelo1.suavizado, lmf(ws = 10))  
@@ -291,9 +291,9 @@ plot(sf::st_geometry(copas.p2r.02), add = TRUE, pch = 3)
 
 ![](code_lidar_copas_botanico_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
-## 4- individual tree segmentation
+### Segmentación de los árboles detectados
 
-segmentation based on the point cloud
+**EXPLICAR**
 
 ``` r
 segmentos <- dalponte2016(dosel.modelo1.suavizado, copas.p2r.02)
@@ -342,7 +342,7 @@ summary(arboles$Z)
 plot(arboles, bg = "white", size = 4, color = "treeID")
 ```
 
-## Extraer árboles individuales
+### Extrayendo árboles individuales
 
 ``` r
 okaliton <- filter_poi(arboles, treeID == 747)
@@ -351,13 +351,75 @@ plot(okaliton, size = 6, bg = "black")
 
 <figure>
 <img src="code_lidar_copas_botanico_files/figure-gfm/rgl_okaliton.png"
-alt="optional caption text" />
-<figcaption aria-hidden="true">optional caption text</figcaption>
+alt="Nube de puntos correspondiente al gran Eucaliptus globulus situado al SE del Botánico" />
+<figcaption aria-hidden="true">Nube de puntos correspondiente al gran
+Eucaliptus globulus situado al SE del Botánico</figcaption>
 </figure>
 
-## 5 - metrics
+Una vez extraidos, esos modelos individuales de árboles son nubes de
+datos, de las que podemos extraer información de la manera habitual:
+`summary()` nos puede devolver información sobre la propia nube de
+puntos, y sobre variables concretas en ella, como la altura (Z).
 
-### tree metrics
+``` r
+summary(okaliton)
+```
+
+    ## class        : LAS (v1.4 format 7)
+    ## memory       : 324.5 Kb 
+    ## extent       : 288535, 288554, 4821879, 4821898 (xmin, xmax, ymin, ymax)
+    ## coord. ref.  : GCS_ETRS_1989 
+    ## area         : 296.6 m²
+    ## points       : 3.3 thousand points
+    ## density      : 11.07 points/m²
+    ## density      : 4.95 pulses/m²
+    ## File signature:           LASF 
+    ## File source ID:           0 
+    ## Global encoding:
+    ##  - GPS Time Type: GPS Week Time 
+    ##  - Synthetic Return Numbers: no 
+    ##  - Well Know Text: CRS is WKT 
+    ##  - Aggregate Model: false 
+    ## Project ID - GUID:        00000000-0000-0000-0000-000000000000 
+    ## Version:                  1.4
+    ## System identifier:         
+    ## Generating software:       
+    ## File creation d/y:        1/1
+    ## header size:              375 
+    ## Offset to point data:     1165 
+    ## Num. var. length record:  1 
+    ## Point data format:        7 
+    ## Point data record length: 36 
+    ## Num. of point records:    3282 
+    ## Num. of points by return: 1469 1104 518 167 24 0 0 0 0 0 0 0 0 0 0 
+    ## Scale factor X Y Z:       0.001 0.001 0.001 
+    ## Offset X Y Z:             287000 4821000 0 
+    ## min X Y Z:                288535 4821879 0 
+    ## max X Y Z:                288554 4821898 47.398 
+    ## Variable Length Records (VLR):
+    ##    Variable Length Record 1 of 2 
+    ##        Description: WKT Information 
+    ##        WKT OGC COORDINATE SYSTEM: COMPOUNDCRS["GCS_ETRS_1989",
+    ##     PROJCRS["ETRS89 / UTM zone 30N (N-E)",
+    ##  [...] (truncated)
+    ##    Variable Length Record 2 of 2 
+    ##        Description: rlas extra bytes 
+    ##        Extra Bytes Description:
+    ##           treeID: An ID for each segmented tree
+    ## Extended Variable Length Records (EVLR):
+    ##    Extended Variable length record 1 of 1 
+    ##        Description: Contains calculated statistics
+
+``` r
+summary(okaliton@data$Z)
+```
+
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##    0.00   19.88   34.33   29.65   42.96   47.40
+
+### Extrayendo métricas
+
+#### A nivel de árbol
 
 ``` r
 Z.media.arbol <- tree_metrics(arboles, func = ~mean(Z))

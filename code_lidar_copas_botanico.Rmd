@@ -62,7 +62,7 @@ str(todo.botanico@data)
 summary(todo.botanico$Z)
 ```
 
-*INTERPRETAR SUMMARY!*
+*INTERPRETAR summary()*
 
 ### Normalizando alturas de la vegetación
 
@@ -83,7 +83,7 @@ plot(todo.botanico.norm, bg = "white", backend="lidRviewer")
 
 ### Modelo de alturas del dosel
 
-*using point-to-raster algorithm*
+*p2r*
 
 ```{r}
 dosel.modelo1 <- rasterize_canopy(todo.botanico.norm, res=1, p2r(subcircle = 0.2), pkg="terra")
@@ -105,7 +105,7 @@ terra::writeRaster(dosel.modelo1.suavizado, "dosel.modelo1.tif", overwrite=T)
 
 ### Detección de árboles
 
-*based on local maximum filter applied to CHM* mayor valor de `ws=` menor número de árboles individualizados
+*lmf 2 chm* Mayor valor de `ws=` menor número de árboles individualizados
 
 ```{r}
 copas.p2r.02 <- locate_trees(dosel.modelo1.suavizado, lmf(ws = 10))  
@@ -136,7 +136,9 @@ okaliton <- filter_poi(arboles, treeID == 747)
 plot(okaliton, size = 6, bg = "black")
 ```
 
-![Nube de puntos correspondiente al gran Eucaliptus globulus situado al SE del Botánico](code_lidar_copas_botanico_files/figure-gfm/rgl_okaliton.png). Una vez extraidos, esos modelos individuales de árboles son nubes de datos, de las que podemos extraer información de la manera habitual: `summary()` nos puede devolver información sobre la propia nube de puntos, y sobre variables concretas en ella, como la altura (Z).
+![Nube de puntos correspondiente al gran Eucaliptus globulus situado al SE del Botánico](code_lidar_copas_botanico_files/figure-gfm/rgl_okaliton.png)
+
+Una vez extraidos, esos modelos individuales de árboles son nubes de datos, de las que podemos extraer información de la manera habitual: `summary()` nos puede devolver información sobre la propia nube de puntos, y sobre variables concretas en ella, como la altura (Z).
 
 ```{r}
 summary(okaliton)
