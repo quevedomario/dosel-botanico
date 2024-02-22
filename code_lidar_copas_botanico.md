@@ -39,23 +39,24 @@ plot(mosaico.botanico)
 ![](code_lidar_copas_botanico_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 La **extracción** de partes del mosaico se puede realizar con las
-distintas funciones `clip`disponibles en **lidR**. A continuación, dos
-ejemplos; un fragmento circular correspondiente a la Carbayeda, y un
-rectángulo de datos incluyendo todos los terrenos del Botánico. Las
+distintas funciones `clip`disponibles en **lidR**.
+
+A continuación, dos ejemplos: un fragmento circular de la Carbayeda, y
+un rectángulo de datos incluyendo todos los terrenos del Botánico. Las
 coordenadas son las originales del conjunto de datos, en este caso UTM
 30N. En ambos casos la función `plot` muestra y permite rotar e inclinar
 la nube de puntos:
 
 ``` r
 carbayeda <- clip_circle(mosaico.botanico, 288115, 4821807, radius = 50)
-## plot(carbayeda)
+plot(carbayeda) 
 ```
 
 ![](code_lidar_copas_botanico_files/figure-gfm/rgl_carbayeda.png)
 
 ``` r
-todo.botanico <- clip_rectangle(mosaico.botanico, 287676,4821673, 288937,4822128)
-## plot(todo.botanico, bg="white")
+todo.botanico <- clip_rectangle(mosaico.botanico, 287676,4821673, 288937,4822128)  
+plot(todo.botanico, bg="white") 
 ```
 
 ![](code_lidar_copas_botanico_files/figure-gfm/rgl_todo_botanico.png)
@@ -63,7 +64,8 @@ todo.botanico <- clip_rectangle(mosaico.botanico, 287676,4821673, 288937,4822128
 Los autores de la librería **lidR** (enlace arriba) tienen también un
 visor de nubes de puntos mucho más ágil, si bien a diferencia del
 estándar requiere cerrar el visor antes de procesar más código R;
-requiere la instalación de la librería adicional *lidRviewer*:
+requiere la instalación de [la librería adicional
+*lidRviewer*](https://github.com/Jean-Romain/lidRviewer):
 
 ``` r
 plot(todo.botanico, backend="lidRviewer") # default = Z
@@ -72,27 +74,24 @@ plot(todo.botanico, backend="lidRviewer") # default = Z
 A continuación podemos usar funciones para evaluar la condición general
 del conjunto de datos. Concretamente `las_check()` repasa diversos
 indicadores interesantes, entre ellos si los datos están normalizados
-(elaboro debajo), o si existen muchos puntos duplicados.
+(más detalle debajo), o si existen muchos puntos duplicados.
 
 ``` r
-## las_check(todo.botanico)
-## str(todo.botanico@data)
+las_check(todo.botanico)
+str(todo.botanico@data)
 summary(todo.botanico$Z)
 ```
 
-    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##   11.39   24.68   29.35   29.67   33.35   74.16
-
-*INTERPRETAR summary()*
+Esa estadística descriptiva simple se refiere a la variable **Z** de los
+datos: la altura de los puntos sobre el nivel del mar, incluyendo el
+terreno y la vegetación.
 
 ### Normalizando alturas de la vegetación
 
-Hasta el momento el parámetro *Z* en el conjunto de datos recoje la
-altura de cada punto sobre el nivel del mar. Sin embargo para analizr
-estructura de la vegetación puede ser interesante **normalizar las nubes
-de puntos**, eliminando la influencia de la altura del terreno. Es el
-cometido de `normalize_height`, [que admite distintos
-métodos](https://r-lidar.github.io/lidRbook/norm.html).
+Para analizr estructura de la vegetación puede ser interesante
+**normalizar las nubes de puntos**, eliminando la influencia de la
+altura del terreno. Es el cometido de la función`normalize_height`, [que
+admite distintos métodos](https://r-lidar.github.io/lidRbook/norm.html).
 
 Tras normalizar los datos podemos aplicar `las_check` de nuevo, así como
 repasar la nueva distribución de valores de alturas (Z):
@@ -101,58 +100,7 @@ repasar la nueva distribución de valores de alturas (Z):
 todo.botanico.norm <- normalize_height(todo.botanico, tin())
 ```
 
-    ## Delaunay rasterization[==================================----------------] 69% (2 threads)Delaunay rasterization[===================================---------------] 70% (2 threads)Delaunay rasterization[===================================---------------] 71% (2 threads)Delaunay rasterization[====================================--------------] 72% (2 threads)Delaunay rasterization[====================================--------------] 73% (2 threads)Delaunay rasterization[=====================================-------------] 74% (2 threads)Delaunay rasterization[=====================================-------------] 75% (2 threads)Delaunay rasterization[======================================------------] 76% (2 threads)Delaunay rasterization[======================================------------] 77% (2 threads)Delaunay rasterization[=======================================-----------] 78% (2 threads)Delaunay rasterization[=======================================-----------] 79% (2 threads)Delaunay rasterization[========================================----------] 80% (2 threads)Delaunay rasterization[========================================----------] 81% (2 threads)Delaunay rasterization[=========================================---------] 82% (2 threads)Delaunay rasterization[=========================================---------] 83% (2 threads)Delaunay rasterization[==========================================--------] 84% (2 threads)Delaunay rasterization[==========================================--------] 85% (2 threads)Delaunay rasterization[===========================================-------] 86% (2 threads)Delaunay rasterization[===========================================-------] 87% (2 threads)Delaunay rasterization[============================================------] 88% (2 threads)Delaunay rasterization[============================================------] 89% (2 threads)Delaunay rasterization[=============================================-----] 90% (2 threads)Delaunay rasterization[=============================================-----] 91% (2 threads)Delaunay rasterization[==============================================----] 92% (2 threads)Delaunay rasterization[==============================================----] 93% (2 threads)Delaunay rasterization[===============================================---] 94% (2 threads)Delaunay rasterization[===============================================---] 95% (2 threads)Delaunay rasterization[================================================--] 96% (2 threads)Delaunay rasterization[================================================--] 97% (2 threads)Delaunay rasterization[=================================================-] 98% (2 threads)Delaunay rasterization[=================================================-] 99% (2 threads)Delaunay rasterization[==================================================] 100% (2 threads)
-
-``` r
-las_check(todo.botanico.norm)
-```
-
-    ## 
-    ##  Checking the data
-    ##   - Checking coordinates...[0;32m ✓[0m
-    ##   - Checking coordinates type...[0;32m ✓[0m
-    ##   - Checking coordinates range...[0;32m ✓[0m
-    ##   - Checking coordinates quantization...[0;32m ✓[0m
-    ##   - Checking attributes type...[0;32m ✓[0m
-    ##   - Checking ReturnNumber validity...[0;32m ✓[0m
-    ##   - Checking NumberOfReturns validity...[0;32m ✓[0m
-    ##   - Checking ReturnNumber vs. NumberOfReturns...[0;32m ✓[0m
-    ##   - Checking RGB validity...[0;32m ✓[0m
-    ##   - Checking absence of NAs...[0;32m ✓[0m
-    ##   - Checking duplicated points...
-    ##  [1;33m   ⚠ 32 points are duplicated and share XYZ coordinates with other points[0m
-    ##   - Checking degenerated ground points...[0;32m ✓[0m
-    ##   - Checking attribute population...[0;32m ✓[0m
-    ##   - Checking gpstime incoherances[0;32m ✓[0m
-    ##   - Checking flag attributes...[0;32m ✓[0m
-    ##   - Checking user data attribute...[0;32m ✓[0m
-    ##  Checking the header
-    ##   - Checking header completeness...[0;32m ✓[0m
-    ##   - Checking scale factor validity...[0;32m ✓[0m
-    ##   - Checking point data format ID validity...[0;32m ✓[0m
-    ##   - Checking extra bytes attributes validity...[0;32m ✓[0m
-    ##   - Checking the bounding box validity...[0;32m ✓[0m
-    ##   - Checking coordinate reference system...[0;32m ✓[0m
-    ##  Checking header vs data adequacy
-    ##   - Checking attributes vs. point format...[0;32m ✓[0m
-    ##   - Checking header bbox vs. actual content...[0;32m ✓[0m
-    ##   - Checking header number of points vs. actual content...[0;32m ✓[0m
-    ##   - Checking header return number vs. actual content...[0;32m ✓[0m
-    ##  Checking coordinate reference system...
-    ##   - Checking if the CRS was understood by R...[0;32m ✓[0m
-    ##  Checking preprocessing already done 
-    ##   - Checking ground classification...[0;32m yes[0m
-    ##   - Checking normalization...[1;33m maybe[0m
-    ##   - Checking negative outliers...
-    ##  [1;33m   ⚠ 127086 points below 0[0m
-    ##   - Checking flightline classification...[0;32m yes[0m
-    ##  Checking compression
-    ##   - Checking attribute compression...
-    ##    -  Synthetic_flag is compressed
-    ##    -  Keypoint_flag is compressed
-    ##    -  Withheld_flag is compressed
-    ##    -  Overlap_flag is compressed
-    ##    -  UserData is compressed
+    ## Delaunay rasterization[====================================--------------] 73% (2 threads)Delaunay rasterization[=====================================-------------] 74% (2 threads)Delaunay rasterization[=====================================-------------] 75% (2 threads)Delaunay rasterization[======================================------------] 76% (2 threads)Delaunay rasterization[======================================------------] 77% (2 threads)Delaunay rasterization[=======================================-----------] 78% (2 threads)Delaunay rasterization[=======================================-----------] 79% (2 threads)Delaunay rasterization[========================================----------] 80% (2 threads)Delaunay rasterization[========================================----------] 81% (2 threads)Delaunay rasterization[=========================================---------] 82% (2 threads)Delaunay rasterization[=========================================---------] 83% (2 threads)Delaunay rasterization[==========================================--------] 84% (2 threads)Delaunay rasterization[==========================================--------] 85% (2 threads)Delaunay rasterization[===========================================-------] 86% (2 threads)Delaunay rasterization[===========================================-------] 87% (2 threads)Delaunay rasterization[============================================------] 88% (2 threads)Delaunay rasterization[============================================------] 89% (2 threads)Delaunay rasterization[=============================================-----] 90% (2 threads)Delaunay rasterization[=============================================-----] 91% (2 threads)Delaunay rasterization[==============================================----] 92% (2 threads)Delaunay rasterization[==============================================----] 93% (2 threads)Delaunay rasterization[===============================================---] 94% (2 threads)Delaunay rasterization[===============================================---] 95% (2 threads)Delaunay rasterization[================================================--] 96% (2 threads)Delaunay rasterization[================================================--] 97% (2 threads)Delaunay rasterization[=================================================-] 98% (2 threads)Delaunay rasterization[=================================================-] 99% (2 threads)Delaunay rasterization[==================================================] 100% (2 threads)
 
 ``` r
 summary(todo.botanico.norm$Z)
@@ -161,7 +109,12 @@ summary(todo.botanico.norm$Z)
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     ##  -3.934   0.000   1.001   5.593  10.517  47.398
 
-*VALORES NEGATIVOS!!*
+La nueva descriptiva muestra un valor mínimo negativo. Dado que en los
+valores no normalizados de altura no había valores menores de 0, los
+valores normalizados negativos son artefactos de la triangulación (asumo
+que debidos a bajas densidades de puntos “suelo”, pero no estoy seguro).
+En todo caso, podemos prescindir de esos artefactos filtrando los
+valores de altura de las nube de puntos normalizada:
 
 ``` r
 todo.botanico.norm <- filter_poi(todo.botanico.norm, Z >= 0)
@@ -170,7 +123,15 @@ plot(todo.botanico.norm, bg = "white", backend="lidRviewer")
 
 ### Modelo de alturas del dosel
 
-*p2r*
+A continuación elaboramos un modelo de altura del dosel. Será una
+cobertura [en formato
+ráster](https://docs.qgis.org/3.28/es/docs/gentle_gis_introduction/raster_data.html)
+representando los puntos más altos de los retornos, la altura del dosel.
+Hay varios algoritmos posobles para obtener esos modelos; el código a
+continuación usa \*\*point to
+raster\*`**, especificado en`p2r()`, donde el argumento`subcircle =
+0.2\` reemplaza cada punto con un disco de radio conocido (20 cm),
+minimizando los blancos:
 
 ``` r
 dosel.modelo1 <- rasterize_canopy(todo.botanico.norm, res=1, p2r(subcircle = 0.2), pkg="terra")
@@ -181,11 +142,17 @@ plot(dosel.modelo1, col = height.colors(50))
 
 ### Suavizado del modelo - rellenando blancos
 
+A continuación procesamos el modelo de altura del dosel para suavizarlo,
+y rellenar blancos restantes. Las dos primeras líneas de código a
+continuación definen la función de suavizado, mientras que la 3ª lo
+lleva a cabo a través de la librería de manipulación ráster **terra**.
+La última línea exporta el ráster a un archivo GeoTiff - también vía
+**terra** - dejándolo disponible para usos en GIS:
+
 ``` r
 fill.na <- function(x, i=5) { if (is.na(x)[i]) { return(mean(x, na.rm = TRUE)) } else { return(x[i]) }}
 w <- matrix(1, 3, 3)
 
-dosel.modelo1.relleno <- terra::focal(dosel.modelo1, w, fun = fill.na)
 dosel.modelo1.suavizado <- terra::focal(dosel.modelo1, w, fun = mean, na.rm = TRUE)
 
 plot(dosel.modelo1.suavizado, col = height.colors(50))
@@ -220,36 +187,6 @@ arboles <- segment_trees (todo.botanico.norm, segmentos)
 ```
 
 ``` r
-str(arboles@data)
-```
-
-    ## Classes 'data.table' and 'data.frame':   1588949 obs. of  23 variables:
-    ##  $ X                : num  287998 287996 287997 287998 287997 ...
-    ##  $ Y                : num  4821687 4821694 4821716 4821735 4821706 ...
-    ##  $ Z                : num  7.22 5.86 0 8.41 7.67 ...
-    ##  $ gpstime          : num  2.9e+08 2.9e+08 2.9e+08 2.9e+08 2.9e+08 ...
-    ##  $ Intensity        : int  124 126 126 102 11 72 13 33 104 12 ...
-    ##  $ ReturnNumber     : int  1 1 1 1 1 2 1 2 4 1 ...
-    ##  $ NumberOfReturns  : int  2 1 1 1 2 2 4 3 4 4 ...
-    ##  $ ScanDirectionFlag: int  0 0 0 1 1 0 0 0 1 0 ...
-    ##  $ EdgeOfFlightline : int  0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ Classification   : int  6 6 2 5 5 2 5 5 2 5 ...
-    ##  $ ScannerChannel   : int  0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ Synthetic_flag   : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
-    ##  $ Keypoint_flag    : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
-    ##  $ Withheld_flag    : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
-    ##  $ Overlap_flag     : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
-    ##  $ ScanAngle        : num  -15 -15 -16 -16 -15 ...
-    ##  $ UserData         : int  0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ PointSourceID    : int  30 30 30 30 30 30 30 30 30 30 ...
-    ##  $ R                : int  10240 40192 9728 11008 10752 25344 31744 21504 31488 40704 ...
-    ##  $ G                : int  12800 43520 14848 11520 10752 29696 34048 30976 36352 40448 ...
-    ##  $ B                : int  24576 45824 26880 20480 19968 26112 30976 34560 35840 40192 ...
-    ##  $ Zref             : num  37.1 35.4 28.6 36.2 36.8 ...
-    ##  $ treeID           : num  1424 NA NA 1280 1336 ...
-    ##  - attr(*, ".internal.selfref")=<externalptr>
-
-``` r
 arboles <- filter_poi(arboles, !is.na(treeID))
 summary(arboles$Z)
 ```
@@ -260,6 +197,8 @@ summary(arboles$Z)
 ``` r
 plot(arboles, bg = "white", size = 4, color = "treeID")
 ```
+
+\[**imagen árboles**\]
 
 ### Extrayendo árboles individuales
 
