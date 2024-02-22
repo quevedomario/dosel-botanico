@@ -37,7 +37,7 @@ plot(mosaico.botanico)
 
 La **extracción** de partes del mosaico se puede realizar con las distintas funciones `clip`disponibles en **lidR**. A continuación, dos ejemplos; un fragmento circular correspondiente a la Carbayeda, y un rectángulo de datos incluyendo todos los terrenos del Botánico. Las coordenadas son las originales del conjunto de datos, en este caso UTM 30N. En ambos casos la función `plot` muestra y permite rotar e inclinar la nube de puntos:
 
-```{r}
+```{r eval=c(1,3)}
 carbayeda <- clip_circle(mosaico.botanico, 288115, 4821807, radius = 50)
 plot(carbayeda) 
 todo.botanico <- clip_rectangle(mosaico.botanico, 287676,4821673, 288937,4822128)  
@@ -50,13 +50,13 @@ plot(todo.botanico, bg="white")
 
 Los autores de la librería **lidR** (enlace arriba) tienen también un visor de nubes de puntos mucho más ágil, si bien a diferencia del estándar requiere cerrar el visor antes de procesar más código R; requiere la instalación de la librería adicional *lidRviewer*:
 
-```{r}
+```{r eval=FALSE}
 plot(todo.botanico, backend="lidRviewer") # default = Z
 ```
 
 A continuación podemos usar funciones para evaluar la condición general del conjunto de datos. Concretamente `las_check()` repasa diversos indicadores interesantes, entre ellos si los datos están normalizados (elaboro debajo), o si existen muchos puntos duplicados.
 
-```{r}
+```{r lascheck, include=TRUE, echo=3}
 las_check(todo.botanico)
 str(todo.botanico@data)
 summary(todo.botanico$Z)
@@ -66,9 +66,11 @@ summary(todo.botanico$Z)
 
 ### Normalizando alturas de la vegetación
 
-Hasta el momento el parámetro *Z* en el conjunto de datos recoje la altura de cada punto sobre el nivel del mar. Sin embargo para analizr estructura de la vegetación puede ser interesante **normalizar las nubes de puntos**, eliminando la influencia de la altura del terreno. Es el cometido de `normalize_height`, [que admite distintos métodos](https://r-lidar.github.io/lidRbook/norm.html). Tras normalizar los datos podemos aplicar `las_check` de nuevo, así como repasar la nueva distribución de valores de alturas (Z):
+Hasta el momento el parámetro *Z* en el conjunto de datos recoje la altura de cada punto sobre el nivel del mar. Sin embargo para analizr estructura de la vegetación puede ser interesante **normalizar las nubes de puntos**, eliminando la influencia de la altura del terreno. Es el cometido de `normalize_height`, [que admite distintos métodos](https://r-lidar.github.io/lidRbook/norm.html).
 
-```{r}
+Tras normalizar los datos podemos aplicar `las_check` de nuevo, así como repasar la nueva distribución de valores de alturas (Z):
+
+```{r eval = c(1, 3)}
 todo.botanico.norm <- normalize_height(todo.botanico, tin())
 las_check(todo.botanico.norm)
 summary(todo.botanico.norm$Z)
@@ -115,7 +117,7 @@ plot(sf::st_geometry(copas.p2r.02), add = TRUE, pch = 3)
 
 ### Segmentación de los árboles detectados
 
-**EXPLICAR**
+***EXPLICAR...***
 
 ```{r}
 segmentos <- dalponte2016(dosel.modelo1.suavizado, copas.p2r.02)
@@ -140,7 +142,7 @@ plot(okaliton, size = 6, bg = "black")
 
 Una vez extraidos, esos modelos individuales de árboles son nubes de datos, de las que podemos extraer información de la manera habitual: `summary()` nos puede devolver información sobre la propia nube de puntos, y sobre variables concretas en ella, como la altura (Z).
 
-```{r}
+```{r okaliton 2, eval=c(2), echo=1:2}
 summary(okaliton)
 summary(okaliton@data$Z)
 ```
