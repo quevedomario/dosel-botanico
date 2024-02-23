@@ -5,6 +5,8 @@ Marzo 2024
 
 ## Estructura de la vegetación (arbórea y arbustiva) en el [Jardín Botánico Atlántico de Gijón](https://www.gijon.es/es/directorio/jardin-botanico-atlantico-de-gijon)
 
+(usa ctrl + click para abrir enlaces en una nueva pestaña).
+
 Procedimiento desarrollado con la librería *lidR*, siguiendo en gran
 medida las [rutinas descritas por el autor de la
 misma](https://github.com/r-lidar/lidR).
@@ -100,7 +102,7 @@ repasar la nueva distribución de valores de alturas (Z):
 todo.botanico.norm <- normalize_height(todo.botanico, tin())
 ```
 
-    ## Delaunay rasterization[=====================================-------------] 75% (2 threads)Delaunay rasterization[======================================------------] 76% (2 threads)Delaunay rasterization[======================================------------] 77% (2 threads)Delaunay rasterization[=======================================-----------] 78% (2 threads)Delaunay rasterization[=======================================-----------] 79% (2 threads)Delaunay rasterization[========================================----------] 80% (2 threads)Delaunay rasterization[========================================----------] 81% (2 threads)Delaunay rasterization[=========================================---------] 82% (2 threads)Delaunay rasterization[=========================================---------] 83% (2 threads)Delaunay rasterization[==========================================--------] 84% (2 threads)Delaunay rasterization[==========================================--------] 85% (2 threads)Delaunay rasterization[===========================================-------] 86% (2 threads)Delaunay rasterization[===========================================-------] 87% (2 threads)Delaunay rasterization[============================================------] 88% (2 threads)Delaunay rasterization[============================================------] 89% (2 threads)Delaunay rasterization[=============================================-----] 90% (2 threads)Delaunay rasterization[=============================================-----] 91% (2 threads)Delaunay rasterization[==============================================----] 92% (2 threads)Delaunay rasterization[==============================================----] 93% (2 threads)Delaunay rasterization[===============================================---] 94% (2 threads)Delaunay rasterization[===============================================---] 95% (2 threads)Delaunay rasterization[================================================--] 96% (2 threads)Delaunay rasterization[================================================--] 97% (2 threads)Delaunay rasterization[=================================================-] 98% (2 threads)Delaunay rasterization[=================================================-] 99% (2 threads)Delaunay rasterization[==================================================] 100% (2 threads)
+    ## Delaunay rasterization[=====================================-------------] 74% (2 threads)Delaunay rasterization[=====================================-------------] 75% (2 threads)Delaunay rasterization[======================================------------] 76% (2 threads)Delaunay rasterization[======================================------------] 77% (2 threads)Delaunay rasterization[=======================================-----------] 78% (2 threads)Delaunay rasterization[=======================================-----------] 79% (2 threads)Delaunay rasterization[========================================----------] 80% (2 threads)Delaunay rasterization[========================================----------] 81% (2 threads)Delaunay rasterization[=========================================---------] 82% (2 threads)Delaunay rasterization[=========================================---------] 83% (2 threads)Delaunay rasterization[==========================================--------] 84% (2 threads)Delaunay rasterization[==========================================--------] 85% (2 threads)Delaunay rasterization[===========================================-------] 86% (2 threads)Delaunay rasterization[===========================================-------] 87% (2 threads)Delaunay rasterization[============================================------] 88% (2 threads)Delaunay rasterization[============================================------] 89% (2 threads)Delaunay rasterization[=============================================-----] 90% (2 threads)Delaunay rasterization[=============================================-----] 91% (2 threads)Delaunay rasterization[==============================================----] 92% (2 threads)Delaunay rasterization[==============================================----] 93% (2 threads)Delaunay rasterization[===============================================---] 94% (2 threads)Delaunay rasterization[===============================================---] 95% (2 threads)Delaunay rasterization[================================================--] 96% (2 threads)Delaunay rasterization[================================================--] 97% (2 threads)Delaunay rasterization[=================================================-] 98% (2 threads)Delaunay rasterization[=================================================-] 99% (2 threads)Delaunay rasterization[==================================================] 100% (2 threads)
 
 ``` r
 summary(todo.botanico.norm$Z)
@@ -159,8 +161,7 @@ terra::writeRaster(dosel.modelo.suave, "dosel.modelo.tif", overwrite=T)
 
 ### Detección de árboles
 
-*lmf 2 chm* Mayor valor de `ws=` menor número de árboles
-individualizados
+*lmf 2 chm*
 
 ``` r
 copas.p2r.02 <- locate_trees(dosel.modelo.suave, lmf(ws = 10))
@@ -170,15 +171,15 @@ copas.p2r.02 <- locate_trees(dosel.modelo.suave, lmf(ws = 10))
 
 ### Segmentación de los árboles detectados
 
-***EXPLICAR…***
+**EXPLICAR…**
 
 ``` r
 segmentos <- dalponte2016(dosel.modelo.suave, copas.p2r.02)
-arboles <- segment_trees (todo.botanico.norm, segmentos)
+copas <- segment_trees (todo.botanico.norm, segmentos)
 ```
 
 ``` r
-arboles <- filter_poi(arboles, !is.na(treeID))
+arboles <- filter_poi(copas, !is.na(treeID))
 summary(arboles$Z)
 ```
 
@@ -189,7 +190,11 @@ summary(arboles$Z)
 plot(arboles, bg = "white", size = 4, color = "treeID")
 ```
 
-\[**imagen árboles**\]
+<figure>
+<img src="code_lidar_copas_botanico_files/figure-gfm/arboles.png"
+alt="Árboles individualizados" />
+<figcaption aria-hidden="true">Árboles individualizados</figcaption>
+</figure>
 
 ### Extrayendo árboles individuales
 
