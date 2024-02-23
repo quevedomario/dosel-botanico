@@ -14,6 +14,7 @@ knitr::opts_chunk$set(
 ```
 
 ## Estructura de la vegetación (arbórea y arbustiva) en el [Jardín Botánico Atlántico de Gijón](https://www.gijon.es/es/directorio/jardin-botanico-atlantico-de-gijon)
+(usa ctrl + click para abrir enlaces en una nueva pestaña)
 
 Procedimiento desarrollado con la librería *lidR*, siguiendo en gran medida las [rutinas descritas por el autor de la misma](https://github.com/r-lidar/lidR).
 
