@@ -36,7 +36,7 @@ apenas memoria:
 plot(mosaico.botanico)
 ```
 
-![](code_lidar_copas_botanico_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](code_lidar_copas_botanico_files/figure-gfm/plot%20mosaico-1.png)<!-- -->
 
 La **extracción** de partes del mosaico se puede realizar con las
 distintas funciones `clip`disponibles en **lidR**.
@@ -100,7 +100,7 @@ repasar la nueva distribución de valores de alturas (Z):
 todo.botanico.norm <- normalize_height(todo.botanico, tin())
 ```
 
-    ## Delaunay rasterization[====================================--------------] 73% (2 threads)Delaunay rasterization[=====================================-------------] 74% (2 threads)Delaunay rasterization[=====================================-------------] 75% (2 threads)Delaunay rasterization[======================================------------] 76% (2 threads)Delaunay rasterization[======================================------------] 77% (2 threads)Delaunay rasterization[=======================================-----------] 78% (2 threads)Delaunay rasterization[=======================================-----------] 79% (2 threads)Delaunay rasterization[========================================----------] 80% (2 threads)Delaunay rasterization[========================================----------] 81% (2 threads)Delaunay rasterization[=========================================---------] 82% (2 threads)Delaunay rasterization[=========================================---------] 83% (2 threads)Delaunay rasterization[==========================================--------] 84% (2 threads)Delaunay rasterization[==========================================--------] 85% (2 threads)Delaunay rasterization[===========================================-------] 86% (2 threads)Delaunay rasterization[===========================================-------] 87% (2 threads)Delaunay rasterization[============================================------] 88% (2 threads)Delaunay rasterization[============================================------] 89% (2 threads)Delaunay rasterization[=============================================-----] 90% (2 threads)Delaunay rasterization[=============================================-----] 91% (2 threads)Delaunay rasterization[==============================================----] 92% (2 threads)Delaunay rasterization[==============================================----] 93% (2 threads)Delaunay rasterization[===============================================---] 94% (2 threads)Delaunay rasterization[===============================================---] 95% (2 threads)Delaunay rasterization[================================================--] 96% (2 threads)Delaunay rasterization[================================================--] 97% (2 threads)Delaunay rasterization[=================================================-] 98% (2 threads)Delaunay rasterization[=================================================-] 99% (2 threads)Delaunay rasterization[==================================================] 100% (2 threads)
+    ## Delaunay rasterization[=====================================-------------] 75% (2 threads)Delaunay rasterization[======================================------------] 76% (2 threads)Delaunay rasterization[======================================------------] 77% (2 threads)Delaunay rasterization[=======================================-----------] 78% (2 threads)Delaunay rasterization[=======================================-----------] 79% (2 threads)Delaunay rasterization[========================================----------] 80% (2 threads)Delaunay rasterization[========================================----------] 81% (2 threads)Delaunay rasterization[=========================================---------] 82% (2 threads)Delaunay rasterization[=========================================---------] 83% (2 threads)Delaunay rasterization[==========================================--------] 84% (2 threads)Delaunay rasterization[==========================================--------] 85% (2 threads)Delaunay rasterization[===========================================-------] 86% (2 threads)Delaunay rasterization[===========================================-------] 87% (2 threads)Delaunay rasterization[============================================------] 88% (2 threads)Delaunay rasterization[============================================------] 89% (2 threads)Delaunay rasterization[=============================================-----] 90% (2 threads)Delaunay rasterization[=============================================-----] 91% (2 threads)Delaunay rasterization[==============================================----] 92% (2 threads)Delaunay rasterization[==============================================----] 93% (2 threads)Delaunay rasterization[===============================================---] 94% (2 threads)Delaunay rasterization[===============================================---] 95% (2 threads)Delaunay rasterization[================================================--] 96% (2 threads)Delaunay rasterization[================================================--] 97% (2 threads)Delaunay rasterization[=================================================-] 98% (2 threads)Delaunay rasterization[=================================================-] 99% (2 threads)Delaunay rasterization[==================================================] 100% (2 threads)
 
 ``` r
 summary(todo.botanico.norm$Z)
@@ -118,7 +118,7 @@ valores de altura de las nube de puntos normalizada:
 
 ``` r
 todo.botanico.norm <- filter_poi(todo.botanico.norm, Z >= 0)
-plot(todo.botanico.norm, bg = "white", backend="lidRviewer")
+## plot(todo.botanico.norm, bg = "white", backend="lidRviewer")
 ```
 
 ### Modelo de alturas del dosel
@@ -134,11 +134,11 @@ raster\*`**, especificado en`p2r()`, donde el argumento`subcircle =
 minimizando los blancos:
 
 ``` r
-dosel.modelo1 <- rasterize_canopy(todo.botanico.norm, res=1, p2r(subcircle = 0.2), pkg="terra")
-plot(dosel.modelo1, col = height.colors(50))
+dosel.modelo <- rasterize_canopy(todo.botanico.norm, res=1, p2r(subcircle = 0.2), pkg="terra")
+plot(dosel.modelo, col = height.colors(50))
 ```
 
-![](code_lidar_copas_botanico_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](code_lidar_copas_botanico_files/figure-gfm/modelo%20dosel-1.png)<!-- -->
 
 ### Suavizado del modelo - rellenando blancos
 
@@ -150,18 +150,11 @@ La última línea exporta el ráster a un archivo GeoTiff - también vía
 **terra** - dejándolo disponible para usos en GIS:
 
 ``` r
-fill.na <- function(x, i=5) { if (is.na(x)[i]) { return(mean(x, na.rm = TRUE)) } else { return(x[i]) }}
+fill.na <- function(x, i=5) { if (is.na(x)[i]) { return(mean(x, na.rm = TRUE)) } 
+  else { return(x[i]) }}
 w <- matrix(1, 3, 3)
-
-dosel.modelo1.suavizado <- terra::focal(dosel.modelo1, w, fun = mean, na.rm = TRUE)
-
-plot(dosel.modelo1.suavizado, col = height.colors(50))
-```
-
-![](code_lidar_copas_botanico_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
-
-``` r
-terra::writeRaster(dosel.modelo1.suavizado, "dosel.modelo1.tif", overwrite=T)
+dosel.modelo.suave <- terra::focal (dosel.modelo, w, fun = mean, na.rm = TRUE)
+terra::writeRaster(dosel.modelo.suave, "dosel.modelo.tif", overwrite=T)
 ```
 
 ### Detección de árboles
@@ -170,19 +163,17 @@ terra::writeRaster(dosel.modelo1.suavizado, "dosel.modelo1.tif", overwrite=T)
 individualizados
 
 ``` r
-copas.p2r.02 <- locate_trees(dosel.modelo1.suavizado, lmf(ws = 10))  
-plot(dosel.modelo1.suavizado, col = height.colors(50))
-plot(sf::st_geometry(copas.p2r.02), add = TRUE, pch = 3)
+copas.p2r.02 <- locate_trees(dosel.modelo.suave, lmf(ws = 10))
+## plot(dosel.modelo.suave, col = height.colors(50))
+## plot(sf::st_geometry(copas.p2r.02), add = TRUE, pch = 3)
 ```
-
-![](code_lidar_copas_botanico_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ### Segmentación de los árboles detectados
 
 ***EXPLICAR…***
 
 ``` r
-segmentos <- dalponte2016(dosel.modelo1.suavizado, copas.p2r.02)
+segmentos <- dalponte2016(dosel.modelo.suave, copas.p2r.02)
 arboles <- segment_trees (todo.botanico.norm, segmentos)
 ```
 
@@ -229,7 +220,7 @@ summary(okaliton@data$Z)
 
 ### Extrayendo métricas
 
-#### A nivel de árbol
+- A nivel de árbol
 
 ``` r
 Z.media.arbol <- tree_metrics(arboles, func = ~mean(Z))
@@ -237,3 +228,5 @@ View(Z.media.arbol@data)
 n.retornos <- tree_metrics(arboles, func = ~length(ReturnNumber))
 View(n.retornos@data)
 ```
+
+- A nivel de nube de puntos

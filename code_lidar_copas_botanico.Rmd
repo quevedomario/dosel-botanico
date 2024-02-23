@@ -31,7 +31,7 @@ mosaico.botanico <- catalog("2catalog_botanico")
 
 Un `catalog` es un esquema simple de los datos disponibles, sin ocupar apenas memoria:
 
-```{r}
+```{r plot mosaico}
 plot(mosaico.botanico)
 ```
 
@@ -39,14 +39,14 @@ La **extracción** de partes del mosaico se puede realizar con las distintas fun
 
 A continuación, dos ejemplos: un fragmento circular de la Carbayeda, y un rectángulo de datos incluyendo todos los terrenos del Botánico. Las coordenadas son las originales del conjunto de datos, en este caso UTM 30N. En ambos casos la función `plot` muestra y permite rotar e inclinar la nube de puntos:
 
-```{r}
+```{r plot carbayeda}
 carbayeda <- clip_circle(mosaico.botanico, 288115, 4821807, radius = 50)
 plot(carbayeda) 
 ```
 
 ![](code_lidar_copas_botanico_files/figure-gfm/rgl_carbayeda.png)
 
-```{r}
+```{r plot botanico}
 todo.botanico <- clip_rectangle(mosaico.botanico, 287676,4821673, 288937,4822128)  
 plot(todo.botanico, bg="white") 
 ```
@@ -70,7 +70,6 @@ summary(todo.botanico$Z)
 Esa estadística descriptiva simple se refiere a la variable **Z** de los datos: la altura de los puntos sobre el nivel del mar, incluyendo el terreno y la vegetación. 
 
 ### Normalizando alturas de la vegetación
-
 Para analizr estructura de la vegetación puede ser interesante **normalizar las nubes de puntos**, eliminando la influencia de la altura del terreno. Es el cometido de la función`normalize_height`, [que admite distintos métodos](https://r-lidar.github.io/lidRbook/norm.html).
 
 Tras normalizar los datos podemos aplicar `las_check` de nuevo, así como repasar la nueva distribución de valores de alturas (Z):
@@ -82,7 +81,7 @@ summary(todo.botanico.norm$Z)
 
 La nueva descriptiva muestra un valor mínimo negativo. Dado que en los valores no normalizados de altura no había valores menores de 0, los valores normalizados negativos son artefactos de la triangulación (asumo que debidos a bajas densidades de puntos "suelo", pero no estoy seguro).
 En todo caso, podemos prescindir de esos artefactos filtrando los valores de altura de las nube de puntos normalizada:
-```{r}
+```{r plot botanico norm, eval=c(1)}
 todo.botanico.norm <- filter_poi(todo.botanico.norm, Z >= 0)
 plot(todo.botanico.norm, bg = "white", backend="lidRviewer")
 ```
@@ -90,52 +89,45 @@ plot(todo.botanico.norm, bg = "white", backend="lidRviewer")
 ### Modelo de alturas del dosel
 A continuación elaboramos un modelo de altura del dosel. Será una cobertura [en formato ráster](https://docs.qgis.org/3.28/es/docs/gentle_gis_introduction/raster_data.html) representando los puntos más altos de los retornos, la altura del dosel. 
 Hay varios algoritmos posobles para obtener esos modelos; el código a continuación usa **point to raster*`**, especificado en `p2r()`, donde el argumento `subcircle = 0.2` reemplaza cada punto con un disco de radio conocido (20 cm), minimizando los blancos:
-```{r}
-dosel.modelo1 <- rasterize_canopy(todo.botanico.norm, res=1, p2r(subcircle = 0.2), pkg="terra")
-plot(dosel.modelo1, col = height.colors(50))
+```{r modelo dosel}
+dosel.modelo <- rasterize_canopy(todo.botanico.norm, res=1, p2r(subcircle = 0.2), pkg="terra")
+plot(dosel.modelo, col = height.colors(50))
 ```
 
 ### Suavizado del modelo - rellenando blancos
 A continuación procesamos el modelo de altura del dosel para suavizarlo, y rellenar blancos restantes. Las dos primeras líneas de código a continuación definen la función de suavizado, mientras que la 3ª lo lleva a cabo a través de la librería de manipulación ráster **terra**. La última línea exporta el ráster a un archivo GeoTiff - también vía **terra** - dejándolo disponible para usos en GIS:
-```{r}
-fill.na <- function(x, i=5) { if (is.na(x)[i]) { return(mean(x, na.rm = TRUE)) } else { return(x[i]) }}
+```{r suave}
+fill.na <- function(x, i=5) { if (is.na(x)[i]) { return(mean(x, na.rm = TRUE)) } 
+  else { return(x[i]) }}
 w <- matrix(1, 3, 3)
-
-dosel.modelo1.suavizado <- terra::focal(dosel.modelo1, w, fun = mean, na.rm = TRUE)
-
-plot(dosel.modelo1.suavizado, col = height.colors(50))
-terra::writeRaster(dosel.modelo1.suavizado, "dosel.modelo1.tif", overwrite=T)
+dosel.modelo.suave <- terra::focal (dosel.modelo, w, fun = mean, na.rm = TRUE)
+terra::writeRaster(dosel.modelo.suave, "dosel.modelo.tif", overwrite=T)
 ```
 
 ### Detección de árboles
 *lmf 2 chm* Mayor valor de `ws=` menor número de árboles individualizados
-
-```{r}
-copas.p2r.02 <- locate_trees(dosel.modelo1.suavizado, lmf(ws = 10))  
-plot(dosel.modelo1.suavizado, col = height.colors(50))
+```{r detecta copas, eval=c(1)}
+copas.p2r.02 <- locate_trees(dosel.modelo.suave, lmf(ws = 10))  
+plot(dosel.modelo.suave, col = height.colors(50))
 plot(sf::st_geometry(copas.p2r.02), add = TRUE, pch = 3)
 ```
 
 ### Segmentación de los árboles detectados
-
 ***EXPLICAR...***
-
-```{r}
-segmentos <- dalponte2016(dosel.modelo1.suavizado, copas.p2r.02)
+```{r segmenta copas}
+segmentos <- dalponte2016(dosel.modelo.suave, copas.p2r.02)
 arboles <- segment_trees (todo.botanico.norm, segmentos)
 ```
 
-```{r}
+```{r reten solo arbol}
 arboles <- filter_poi(arboles, !is.na(treeID))
 summary(arboles$Z)
 plot(arboles, bg = "white", size = 4, color = "treeID")
 ```
-
 [**imagen árboles**]
 
 ### Extrayendo árboles individuales
-
-```{r}
+```{r extrae okalito}
 okaliton <- filter_poi(arboles, treeID == 747)
 plot(okaliton, size = 6, bg = "black")
 ```
@@ -150,8 +142,7 @@ summary(okaliton@data$Z)
 ```
 
 ### Extrayendo métricas
-
-#### A nivel de árbol
+* A nivel de árbol
 
 ```{r}
 Z.media.arbol <- tree_metrics(arboles, func = ~mean(Z))
@@ -159,3 +150,5 @@ View(Z.media.arbol@data)
 n.retornos <- tree_metrics(arboles, func = ~length(ReturnNumber))
 View(n.retornos@data)
 ```
+
+* A nivel de nube de puntos
