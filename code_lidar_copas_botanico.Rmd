@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Estructura de la vegetación (arbórea y arbustiva) en el [Jardín Botánico Atlántico de Gijón](https://www.gijon.es/es/directorio/jardin-botanico-atlantico-de-gijon)
+## Medidas de estructura de la vegetación (arbórea y arbustiva) vía LiDAR en el [Jardín Botánico Atlántico de Gijón](https://www.gijon.es/es/directorio/jardin-botanico-atlantico-de-gijon)
 
 (usa ctrl + click para abrir enlaces en una nueva pestaña).
 
@@ -31,7 +31,7 @@ Los datos necesarios para desarrollar este ejemplo son tres archivos .laz de nub
 mosaico.botanico <- catalog("2catalog_botanico")
 ```
 
-Un `catalog` es un esquema simple de los datos disponibles, sin ocupar apenas memoria:
+Un `catalog` es un esquema simple de los datos disponibles, que ocupando muy poca memoria permite trabajar con varios archivos .laz (o .las):
 
 ```{r plot mosaico}
 plot(mosaico.botanico)
@@ -156,12 +156,35 @@ summary(okaliton@data$Z)
 ### Extrayendo métricas
 
 -   A nivel de árbol
-
+La función `tree_metrics()` devuelve métricas en objetos espaciales. Con `str()` comprobamos que constan de varios "cajones", uno de ellos contiene los datos (**@ data**):
 ```{r}
 Z.media.arbol <- tree_metrics(arboles, func = ~mean(Z))
-View(Z.media.arbol@data)
+str(Z.media.arbol)
+```
+Nos quedamos solo con la parte de datos de los objetos generados por `tree_metrics()`, y copiamos la variable relevante cambiándole el nombre:
+```{r}
+Z.media.arbol.data <- Z.media.arbol@data
+Z.media.arbol.data$zmedia <- Z.media.arbol.data$V1
+head(Z.media.arbol.data)
+```
+Lo mismo para el resto de variables: altura máxima, desviación estándar de alturas por árbol, y número de retornos LiDAR por árbol:
+```{r}
+Z.max.arbol <- tree_metrics(arboles, func = ~max(Z))
+Z.max.arbol.data <- Z.max.arbol@data
+Z.max.arbol.data$zmax <- Z.max.arbol.data$V1
+
+Z.sd.arbol <- tree_metrics(arboles, func = ~sd(Z))
+Z.sd.arbol.data <- Z.sd.arbol@data
+Z.sd.arbol.data$zsd <- Z.sd.arbol.data$V1
+
 n.retornos <- tree_metrics(arboles, func = ~length(ReturnNumber))
-View(n.retornos@data)
+n.retornos.data <- n.retornos@data 
+n.retornos.data$nretornos <- n.retornos.data$V1
 ```
 
--   A nivel de nube de puntos
+Finalmente combinamos las métricas extraidas en un único conjunto de datos, reteniendo solo las columnas de interés:
+```{r}
+arboles.metrica <- cbind(Z.media.arbol.data, Z.max.arbol.data, Z.sd.arbol.data, n.retornos.data)
+arboles.metrica <- arboles.metrica[,c(1,3,6,9,12)]
+head(arboles.metrica)
+```

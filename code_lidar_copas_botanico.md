@@ -3,7 +3,7 @@ Modelos de dosel arbóreo a partir de LiDAR
 Mario Quevedo
 Marzo 2024
 
-## Estructura de la vegetación (arbórea y arbustiva) en el [Jardín Botánico Atlántico de Gijón](https://www.gijon.es/es/directorio/jardin-botanico-atlantico-de-gijon)
+## Medidas de estructura de la vegetación (arbórea y arbustiva) vía LiDAR en el [Jardín Botánico Atlántico de Gijón](https://www.gijon.es/es/directorio/jardin-botanico-atlantico-de-gijon)
 
 (usa ctrl + click para abrir enlaces en una nueva pestaña).
 
@@ -31,8 +31,8 @@ El comando `catalog` a continuación construye un mosaico virtual de las
 mosaico.botanico <- catalog("2catalog_botanico")
 ```
 
-Un `catalog` es un esquema simple de los datos disponibles, sin ocupar
-apenas memoria:
+Un `catalog` es un esquema simple de los datos disponibles, que ocupando
+muy poca memoria permite trabajar con varios archivos .laz (o .las):
 
 ``` r
 plot(mosaico.botanico)
@@ -102,7 +102,7 @@ repasar la nueva distribución de valores de alturas (Z):
 todo.botanico.norm <- normalize_height(todo.botanico, tin())
 ```
 
-    ## Delaunay rasterization[=====================================-------------] 74% (2 threads)Delaunay rasterization[=====================================-------------] 75% (2 threads)Delaunay rasterization[======================================------------] 76% (2 threads)Delaunay rasterization[======================================------------] 77% (2 threads)Delaunay rasterization[=======================================-----------] 78% (2 threads)Delaunay rasterization[=======================================-----------] 79% (2 threads)Delaunay rasterization[========================================----------] 80% (2 threads)Delaunay rasterization[========================================----------] 81% (2 threads)Delaunay rasterization[=========================================---------] 82% (2 threads)Delaunay rasterization[=========================================---------] 83% (2 threads)Delaunay rasterization[==========================================--------] 84% (2 threads)Delaunay rasterization[==========================================--------] 85% (2 threads)Delaunay rasterization[===========================================-------] 86% (2 threads)Delaunay rasterization[===========================================-------] 87% (2 threads)Delaunay rasterization[============================================------] 88% (2 threads)Delaunay rasterization[============================================------] 89% (2 threads)Delaunay rasterization[=============================================-----] 90% (2 threads)Delaunay rasterization[=============================================-----] 91% (2 threads)Delaunay rasterization[==============================================----] 92% (2 threads)Delaunay rasterization[==============================================----] 93% (2 threads)Delaunay rasterization[===============================================---] 94% (2 threads)Delaunay rasterization[===============================================---] 95% (2 threads)Delaunay rasterization[================================================--] 96% (2 threads)Delaunay rasterization[================================================--] 97% (2 threads)Delaunay rasterization[=================================================-] 98% (2 threads)Delaunay rasterization[=================================================-] 99% (2 threads)Delaunay rasterization[==================================================] 100% (2 threads)
+    ## Delaunay rasterization[===============================-------------------] 63% (2 threads)Delaunay rasterization[================================------------------] 64% (2 threads)Delaunay rasterization[================================------------------] 65% (2 threads)Delaunay rasterization[=================================-----------------] 66% (2 threads)Delaunay rasterization[=================================-----------------] 67% (2 threads)Delaunay rasterization[==================================----------------] 68% (2 threads)Delaunay rasterization[==================================----------------] 69% (2 threads)Delaunay rasterization[===================================---------------] 70% (2 threads)Delaunay rasterization[===================================---------------] 71% (2 threads)Delaunay rasterization[====================================--------------] 72% (2 threads)Delaunay rasterization[====================================--------------] 73% (2 threads)Delaunay rasterization[=====================================-------------] 74% (2 threads)Delaunay rasterization[=====================================-------------] 75% (2 threads)Delaunay rasterization[======================================------------] 76% (2 threads)Delaunay rasterization[======================================------------] 77% (2 threads)Delaunay rasterization[=======================================-----------] 78% (2 threads)Delaunay rasterization[=======================================-----------] 79% (2 threads)Delaunay rasterization[========================================----------] 80% (2 threads)Delaunay rasterization[========================================----------] 81% (2 threads)Delaunay rasterization[=========================================---------] 82% (2 threads)Delaunay rasterization[=========================================---------] 83% (2 threads)Delaunay rasterization[==========================================--------] 84% (2 threads)Delaunay rasterization[==========================================--------] 85% (2 threads)Delaunay rasterization[===========================================-------] 86% (2 threads)Delaunay rasterization[===========================================-------] 87% (2 threads)Delaunay rasterization[============================================------] 88% (2 threads)Delaunay rasterization[============================================------] 89% (2 threads)Delaunay rasterization[=============================================-----] 90% (2 threads)Delaunay rasterization[=============================================-----] 91% (2 threads)Delaunay rasterization[==============================================----] 92% (2 threads)Delaunay rasterization[==============================================----] 93% (2 threads)Delaunay rasterization[===============================================---] 94% (2 threads)Delaunay rasterization[===============================================---] 95% (2 threads)Delaunay rasterization[================================================--] 96% (2 threads)Delaunay rasterization[================================================--] 97% (2 threads)Delaunay rasterization[=================================================-] 98% (2 threads)Delaunay rasterization[=================================================-] 99% (2 threads)Delaunay rasterization[==================================================] 100% (2 threads)
 
 ``` r
 summary(todo.botanico.norm$Z)
@@ -225,13 +225,80 @@ summary(okaliton@data$Z)
 
 ### Extrayendo métricas
 
-- A nivel de árbol
+- A nivel de árbol La función `tree_metrics()` devuelve métricas en
+  objetos espaciales. Con `str()` comprobamos que constan de varios
+  “cajones”, uno de ellos contiene los datos (**@ data**):
 
 ``` r
 Z.media.arbol <- tree_metrics(arboles, func = ~mean(Z))
-View(Z.media.arbol@data)
-n.retornos <- tree_metrics(arboles, func = ~length(ReturnNumber))
-View(n.retornos@data)
+str(Z.media.arbol)
 ```
 
-- A nivel de nube de puntos
+    ## Formal class 'SpatialPointsDataFrame' [package "sp"] with 5 slots
+    ##   ..@ data       :'data.frame':  1417 obs. of  2 variables:
+    ##   .. ..$ treeID: num [1:1417] 3 5 7 8 9 10 11 12 13 14 ...
+    ##   .. ..$ V1    : num [1:1417] 10.63 5.27 4.35 1.46 1.23 ...
+    ##   ..@ coords.nrs : num(0) 
+    ##   ..@ coords     : num [1:1417, 1:3] 288432 288812 288801 288835 288698 ...
+    ##   .. ..- attr(*, "dimnames")=List of 2
+    ##   .. .. ..$ : NULL
+    ##   .. .. ..$ : chr [1:3] "coords.x1" "coords.x2" "coords.x3"
+    ##   ..@ bbox       : num [1:3, 1:2] 2.88e+05 4.82e+06 2.11 2.89e+05 4.82e+06 ...
+    ##   .. ..- attr(*, "dimnames")=List of 2
+    ##   .. .. ..$ : chr [1:3] "coords.x1" "coords.x2" "coords.x3"
+    ##   .. .. ..$ : chr [1:2] "min" "max"
+    ##   ..@ proj4string:Formal class 'CRS' [package "sp"] with 1 slot
+    ##   .. .. ..@ projargs: chr "+proj=utm +zone=30 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +vunits=m +no_defs"
+    ##   .. .. ..$ comment: chr "COMPOUNDCRS[\"GCS_ETRS_1989\",\n    PROJCRS[\"ETRS89 / UTM zone 30N (N-E)\",\n        BASEGEOGCRS[\"ETRS89\",\n"| __truncated__
+
+Nos quedamos solo con la parte de datos de los objetos generados por
+`tree_metrics()`, y copiamos la variable relevante cambiándole el
+nombre:
+
+``` r
+Z.media.arbol.data <- Z.media.arbol@data
+Z.media.arbol.data$zmedia <- Z.media.arbol.data$V1
+head(Z.media.arbol.data)
+```
+
+    ##   treeID        V1    zmedia
+    ## 1      3 10.632250 10.632250
+    ## 2      5  5.270444  5.270444
+    ## 3      7  4.353821  4.353821
+    ## 4      8  1.458667  1.458667
+    ## 5      9  1.231250  1.231250
+    ## 6     10  3.594292  3.594292
+
+Lo mismo para el resto de variables: altura máxima, desviación estándar
+de alturas por árbol, y número de retornos LiDAR por árbol:
+
+``` r
+Z.max.arbol <- tree_metrics(arboles, func = ~max(Z))
+Z.max.arbol.data <- Z.max.arbol@data
+Z.max.arbol.data$zmax <- Z.max.arbol.data$V1
+
+Z.sd.arbol <- tree_metrics(arboles, func = ~sd(Z))
+Z.sd.arbol.data <- Z.sd.arbol@data
+Z.sd.arbol.data$zsd <- Z.sd.arbol.data$V1
+
+n.retornos <- tree_metrics(arboles, func = ~length(ReturnNumber))
+n.retornos.data <- n.retornos@data 
+n.retornos.data$nretornos <- n.retornos.data$V1
+```
+
+Finalmente combinamos las métricas extraidas en un único conjunto de
+datos, reteniendo solo las columnas de interés:
+
+``` r
+arboles.metrica <- cbind(Z.media.arbol.data, Z.max.arbol.data, Z.sd.arbol.data, n.retornos.data)
+arboles.metrica <- arboles.metrica[,c(1,3,6,9,12)]
+head(arboles.metrica)
+```
+
+    ##   treeID    zmedia   zmax       zsd nretornos
+    ## 1      3 10.632250 16.264 7.2628748         4
+    ## 2      5  5.270444 11.142 4.3771419         9
+    ## 3      7  4.353821 10.280 2.9756124       140
+    ## 4      8  1.458667  4.095 1.5438148         9
+    ## 5      9  1.231250  3.803 1.7942303         4
+    ## 6     10  3.594292  4.544 0.9306946        96

@@ -47,7 +47,22 @@ summary(okaliton)
 summary(okaliton@data$Z)
 
 Z.media.arbol <- tree_metrics(arboles, func = ~mean(Z))
-View(Z.media.arbol@data)
-n.retornos <- tree_metrics(arboles, func = ~length(ReturnNumber))
-View(n.retornos@data)
+Z.media.arbol.data <- Z.media.arbol@data
+Z.media.arbol.data$zmedia <- Z.media.arbol.data$V1
+View(Z.media.arbol.data)
 
+Z.max.arbol <- tree_metrics(arboles, func = ~max(Z))
+Z.max.arbol.data <- Z.max.arbol@data
+Z.max.arbol.data$zmax <- Z.max.arbol.data$V1
+
+Z.sd.arbol <- tree_metrics(arboles, func = ~sd(Z))
+Z.sd.arbol.data <- Z.sd.arbol@data
+Z.sd.arbol.data$zsd <- Z.sd.arbol.data$V1
+
+n.retornos <- tree_metrics(arboles, func = ~length(ReturnNumber))
+n.retornos.data <- n.retornos@data 
+n.retornos.data$nretornos <- n.retornos.data$V1
+
+arboles.metrica <- cbind(Z.media.arbol.data, Z.max.arbol.data, Z.sd.arbol.data, n.retornos.data)
+arboles.metrica <- arboles.metrica[,c(1,3,6,9,12)]
+head(arboles.metrica)
