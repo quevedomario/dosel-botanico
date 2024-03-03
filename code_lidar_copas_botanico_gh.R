@@ -46,23 +46,24 @@ plot(okaliton, size = 6, bg = "white", color = "Z", backend="lidRviewer")
 summary(okaliton)
 summary(okaliton@data$Z)
 
-Z.media.arbol <- tree_metrics(arboles, func = ~mean(Z))
-Z.media.arbol.data <- Z.media.arbol@data
-Z.media.arbol.data$zmedia <- Z.media.arbol.data$V1
-View(Z.media.arbol.data)
+Z.media.arbol <- crown_metrics(arboles, func = ~mean(Z)) #update rmd to crown_metrics!!
+#Z.media.arbol.data <- Z.media.arbol@data
+Z.media.arbol$zmedia <- Z.media.arbol$V1
+Z.media.arbol$V1 <- NULL
+View(Z.media.arbol)
 
-Z.max.arbol <- tree_metrics(arboles, func = ~max(Z))
-Z.max.arbol.data <- Z.max.arbol@data
-Z.max.arbol.data$zmax <- Z.max.arbol.data$V1
+Z.max.arbol <- crown_metrics(arboles, func = ~max(Z))
+Z.max.arbol$zmax <- Z.max.arbol$V1
+Z.max.arbol$V1 <- NULL
 
-Z.sd.arbol <- tree_metrics(arboles, func = ~sd(Z))
-Z.sd.arbol.data <- Z.sd.arbol@data
-Z.sd.arbol.data$zsd <- Z.sd.arbol.data$V1
+Z.sd.arbol <- crown_metrics(arboles, func = ~sd(Z))
+Z.sd.arbol$zsd <- Z.sd.arbol$V1
+Z.sd.arbol$V1 <- NULL
 
-n.retornos <- tree_metrics(arboles, func = ~length(ReturnNumber))
-n.retornos.data <- n.retornos@data 
-n.retornos.data$nretornos <- n.retornos.data$V1
+n.retornos <- crown_metrics(arboles, func = ~length(ReturnNumber))
+n.retornos$nretornos <- n.retornos$V1
+n.retornos$V1 <- NULL
 
-arboles.metrica <- cbind(Z.media.arbol.data, Z.max.arbol.data, Z.sd.arbol.data, n.retornos.data)
-arboles.metrica <- arboles.metrica[,c(1,3,6,9,12)]
+arboles.metrica <- cbind(Z.media.arbol, Z.max.arbol, Z.sd.arbol, n.retornos)
+arboles.metrica <- arboles.metrica[,c(1,2,4,6,8,9)]
 head(arboles.metrica)
