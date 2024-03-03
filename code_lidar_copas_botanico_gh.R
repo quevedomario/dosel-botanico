@@ -46,8 +46,9 @@ plot(okaliton, size = 6, bg = "white", color = "Z", backend="lidRviewer")
 summary(okaliton)
 summary(okaliton@data$Z)
 
-Z.media.arbol <- crown_metrics(arboles, func = ~mean(Z)) #update rmd to crown_metrics!!
-#Z.media.arbol.data <- Z.media.arbol@data
+Z.media.arbol <- crown_metrics(arboles, func = ~mean(Z))
+c <- crown_metrics(arboles, func = ~mean(Z), geom = "convex")
+
 Z.media.arbol$zmedia <- Z.media.arbol$V1
 Z.media.arbol$V1 <- NULL
 View(Z.media.arbol)
