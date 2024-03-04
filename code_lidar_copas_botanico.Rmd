@@ -183,9 +183,16 @@ n.retornos$nretornos <- n.retornos$V1
 n.retornos$V1 <- NULL
 ```
 
+
 Finalmente combinamos las métricas extraidas en un único conjunto de datos, reteniendo solo las columnas de interés:
 ```{r}
 arboles.metrica <- cbind(Z.media.arbol, Z.max.arbol, Z.sd.arbol, n.retornos)
 arboles.metrica <- arboles.metrica[,c(1,2,4,6,8,9)]
 head(arboles.metrica)
 ```
+
+El procedimiento anterior se puede simplificar: las métricas más comunes están pre-definidas en el argumento `func = .stdmetrics`, si bien esa opción ofrece una salida muy prolija:
+```{r results='hide'}
+arboles.metrica.2 <- crown_metrics(arboles, func = .stdmetrics)
+```
+

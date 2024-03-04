@@ -68,3 +68,5 @@ n.retornos$V1 <- NULL
 arboles.metrica <- cbind(Z.media.arbol, Z.max.arbol, Z.sd.arbol, n.retornos)
 arboles.metrica <- arboles.metrica[,c(1,2,4,6,8,9)]
 head(arboles.metrica)
+
+arboles.metrica.2 <- crown_metrics(arboles, func = .stdmetrics)
