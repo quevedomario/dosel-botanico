@@ -34,8 +34,8 @@ copas.p2r.02 <- locate_trees(dosel.modelo.suave, lmf(ws = 10))
 plot(dosel.modelo.suave, col = height.colors(50))
 plot(sf::st_geometry(copas.p2r.02), add = TRUE, pch = 3)
 
-segmentos <- dalponte2016(dosel.modelo.suave, copas.p2r.02)
-copas <- segment_trees (todo.botanico.norm, segmentos)
+segmenta <- dalponte2016(dosel.modelo.suave, copas.p2r.02)
+copas <- segment_trees (todo.botanico.norm, segmenta)
 
 arboles <- filter_poi(copas, !is.na(treeID))
 summary(arboles$Z)
@@ -70,3 +70,7 @@ arboles.metrica <- arboles.metrica[,c(1,2,4,6,8,9)]
 head(arboles.metrica)
 
 arboles.metrica.2 <- crown_metrics(arboles, func = .stdmetrics)
+
+parcelas <- sf::st_read("parcelas.shp", quiet = TRUE)
+metricas <- plot_metrics(todo.botanico.norm, func = .stdmetrics, parcelas, radius = 20)
+head(metricas)

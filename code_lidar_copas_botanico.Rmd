@@ -155,7 +155,7 @@ summary(okaliton@data$Z)
 
 ### Extrayendo métricas
 
--   A nivel de árbol
+####  A nivel de árbol
 La función `crown_metrics()` devuelve métricas de árboles (copas) individuales. La función incluye al menos dos argumentos - la nube de puntos de interés, y la función a extraer; en este primer caso, la media de altura de cada árbol:
 ```{r}
 Z.media.arbol <- crown_metrics(arboles, func = ~mean(Z))
@@ -196,3 +196,18 @@ El procedimiento anterior se puede simplificar: las métricas más comunes está
 arboles.metrica.2 <- crown_metrics(arboles, func = .stdmetrics)
 ```
 
+####  A nivel de parcela
+Puede resulta útul en ocasiones evaluar la estructura de la vegetación en una parcela de tamaño determinado. Es procedimiento habitual en inventarios forestales, y es frecuente también cuando evaluamos el uso de hábitat por parte de animales. En este caso utilizaremos 4 puntos de interés, para los que tenemos grabaciones de vocalizaciones de aves.
+La librería **LiDR** incluye la función `plot_metrics()` para facilitar la extracción de métricas *tipo inventario*. La función requiere especificar la nube de puntos LiDAR, las métricas que queremos extraer, la localización de las parcelas, y el radio de las mismas. 
+Para manejar la localización de las parcelas, importamos una capa de puntos, en este caso 4; el formato utilizado es el viejo formato vectorial *shapefile* (extensión *shp*):  
+```{r}
+parcelas <- sf::st_read("parcelas.shp", quiet = TRUE)
+```
+
+A continuación pedimos por eficiencia el lote completo de métrica estándar visto arriba, del que nos interesan solo unas pocas variables, con parcelas de 20 m de radio (1257 m2): 
+```{r}
+metricas <- plot_metrics(todo.botanico.norm, func = .stdmetrics, parcelas, radius = 20)
+head(metricas)
+```
+
+Las tres primeras métricas disponibles son *zmax*, *zmean*, y *zsd*, i.e. altura máxima, media, y desviación estándar en cada parcela.
