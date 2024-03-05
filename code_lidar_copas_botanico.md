@@ -15,8 +15,8 @@ Gijón](https://www.gijon.es/es/directorio/jardin-botanico-atlantico-de-gijon)
 Los datos necesarios para desarrollar el ejemplo salen de tres archivos
 *.laz*: nubes de puntos LiDAR 3D, [descargados del
 IGN](https://centrodedescargas.cnig.es/CentroDescargas/busquedaSerie.do?codSerie=MLID2#).
-Cada archivo cubre 2 x 2 km, e incluyen coloración verdadera (RGB).
-Están incluidos [en la carpeta comprimida
+Cada archivo cubre 2 x 2 km, e incorporan coloración verdadera (RGB)
+derivada de las ortofotos. Están incluidos [en la carpeta comprimida
 2catalog_botanico.zip](https://www.dropbox.com/scl/fi/keaer5i67xc6p8toqna9d/2catalog_botanico.zip?rlkey=eb3tmq74au5i71wx3pnnrstdk&dl=0).
 Los comandos a continuación asumen que las 3 coberturas *.laz* están en
 una carpeta llamada “2catalog_botanico”, y esta a su vez en el
@@ -24,20 +24,18 @@ directorio de trabajo de R (`setwd()`).
 
 La rutina usa la librería *lidR*, siguiendo en gran medida los
 [procedimientos descritos por el autor de la
-misma](https://github.com/r-lidar/lidR).
-
-Los pasos iniciales serán instalar la librería, y a continuación
-cargarla en la sesión de R:
+misma](https://github.com/r-lidar/lidR). Los pasos iniciales serán
+instalar la librería, y a continuación cargarla en la sesión de R:
 
 ``` r
 library(lidR)
 ```
 
-La librería permite leer y escribir los formatos .las y .laz, e incluye
-funciones a distinto nivel de organización de datos.
+**lidR** permite leer y escribir formatos habutuales de coberturas
+LiDAR, *.las* y *.laz*.
 
-El comando `catalog` a continuación construye un mosaico virtual de los
-3 archivos *.laz* de 2 x 2 km cada uno. Un `catalog` es un esquema
+La función `catalog` a continuación construye un mosaico virtual de los
+3 archivos *.laz* de 2 x 2 km descargados. Un `catalog` es un esquema
 simple de los datos disponibles, que ocupando muy poca memoria permite
 trabajar a la vez con múltiples archivos *.laz* (o *.las*):
 
@@ -49,12 +47,14 @@ plot(mosaico.botanico)
 ![](code_lidar_copas_botanico_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 La **extracción** de partes del mosaico se puede realizar con las
-distintas funciones `clip`disponibles en **lidR**. A continuación, dos
-ejemplos de extracción de partes del mosaico: un fragmento circular de
-la Carbayeda del Botánico, y un rectángulo de datos incluyendo todos los
-terrenos del Botánico. Las coordenadas son las originales del conjunto
-de datos, en este caso UTM 30N. En ambos casos la función `plot` muestra
-y permite rotar e inclinar la nube de puntos:
+distintas funciones `clip`disponibles en **lidR**. `clip` extrae parte
+de la nube de puntos, guardándola a su vez memoria en formato *.las*. A
+continuación, dos ejemplos de extracción de partes del mosaico: un
+fragmento circular de la Carbayeda del Botánico, y un rectángulo
+incluyendo todos los terrenos del Botánico. Las coordenadas son las
+originales del conjunto de datos, en este caso UTM 30N. En ambos casos
+la función `plot` simula 3D, permitiendo rotar e inclinar la nube de
+puntos:
 
 ``` r
 carbayeda <- clip_circle(mosaico.botanico, 288115, 4821807, radius = 50)
@@ -74,10 +74,12 @@ Los autores de la librería **lidR** (enlace arriba) tienen también un
 visor de nubes de puntos mucho más ágil, si bien a diferencia del
 estándar requiere cerrar el visor antes de procesar otro código R.
 Requiere la instalación de [la librería adicional
-*lidRviewer*](https://github.com/Jean-Romain/lidRviewer):
+*lidRviewer*](https://github.com/Jean-Romain/lidRviewer). Usa por
+defecto la altura (Z) de los puntos como variable para colorear la nube
+de puntos:
 
 ``` r
-plot(todo.botanico, backend="lidRviewer") # default = Z
+plot(todo.botanico, backend="lidRviewer")
 ```
 
 A continuación podemos usar funciones para evaluar la condición general
@@ -98,70 +100,21 @@ infraestructuras).
 
 ### Normalizando alturas de la vegetación
 
-Para analizar estructura de la vegetación puede ser interesante eliminar
-la influencia de la elevación del terreno, refiriendo la altura de cada
-punto de la vegetación a 0 metros. Esa **normalización de las nubes de
-puntos** es el cometido de la función`normalize_height`, [que admite
-distintos métodos](https://r-lidar.github.io/lidRbook/norm.html). Tras
-normalizar los datos podemos aplicar `las_check` de nuevo, así como
+Para analizar la estructura de la vegetación puede ser interesante
+eliminar la influencia de la elevación del terreno, refiriendo la altura
+de cada punto de la vegetación a 0 metros. Esa **normalización de las
+nubes de puntos** es el cometido de la función`normalize_height`, [que
+admite distintos métodos](https://r-lidar.github.io/lidRbook/norm.html).
+Tras normalizar los datos podemos aplicar `las_check` de nuevo, así como
 repasar la nueva distribución de valores de alturas (Z):
 
 ``` r
 todo.botanico.norm <- normalize_height(todo.botanico, tin())
 ```
 
-    ## Delaunay rasterization[===================================---------------] 70% (2 threads)Delaunay rasterization[===================================---------------] 71% (2 threads)Delaunay rasterization[====================================--------------] 72% (2 threads)Delaunay rasterization[====================================--------------] 73% (2 threads)Delaunay rasterization[=====================================-------------] 74% (2 threads)Delaunay rasterization[=====================================-------------] 75% (2 threads)Delaunay rasterization[======================================------------] 76% (2 threads)Delaunay rasterization[======================================------------] 77% (2 threads)Delaunay rasterization[=======================================-----------] 78% (2 threads)Delaunay rasterization[=======================================-----------] 79% (2 threads)Delaunay rasterization[========================================----------] 80% (2 threads)Delaunay rasterization[========================================----------] 81% (2 threads)Delaunay rasterization[=========================================---------] 82% (2 threads)Delaunay rasterization[=========================================---------] 83% (2 threads)Delaunay rasterization[==========================================--------] 84% (2 threads)Delaunay rasterization[==========================================--------] 85% (2 threads)Delaunay rasterization[===========================================-------] 86% (2 threads)Delaunay rasterization[===========================================-------] 87% (2 threads)Delaunay rasterization[============================================------] 88% (2 threads)Delaunay rasterization[============================================------] 89% (2 threads)Delaunay rasterization[=============================================-----] 90% (2 threads)Delaunay rasterization[=============================================-----] 91% (2 threads)Delaunay rasterization[==============================================----] 92% (2 threads)Delaunay rasterization[==============================================----] 93% (2 threads)Delaunay rasterization[===============================================---] 94% (2 threads)Delaunay rasterization[===============================================---] 95% (2 threads)Delaunay rasterization[================================================--] 96% (2 threads)Delaunay rasterization[================================================--] 97% (2 threads)Delaunay rasterization[=================================================-] 98% (2 threads)Delaunay rasterization[=================================================-] 99% (2 threads)Delaunay rasterization[==================================================] 100% (2 threads)
-
 ``` r
 las_check(todo.botanico.norm)
 ```
-
-    ## 
-    ##  Checking the data
-    ##   - Checking coordinates...[0;32m ✓[0m
-    ##   - Checking coordinates type...[0;32m ✓[0m
-    ##   - Checking coordinates range...[0;32m ✓[0m
-    ##   - Checking coordinates quantization...[0;32m ✓[0m
-    ##   - Checking attributes type...[0;32m ✓[0m
-    ##   - Checking ReturnNumber validity...[0;32m ✓[0m
-    ##   - Checking NumberOfReturns validity...[0;32m ✓[0m
-    ##   - Checking ReturnNumber vs. NumberOfReturns...[0;32m ✓[0m
-    ##   - Checking RGB validity...[0;32m ✓[0m
-    ##   - Checking absence of NAs...[0;32m ✓[0m
-    ##   - Checking duplicated points...
-    ##  [1;33m   ⚠ 32 points are duplicated and share XYZ coordinates with other points[0m
-    ##   - Checking degenerated ground points...[0;32m ✓[0m
-    ##   - Checking attribute population...[0;32m ✓[0m
-    ##   - Checking gpstime incoherances[0;32m ✓[0m
-    ##   - Checking flag attributes...[0;32m ✓[0m
-    ##   - Checking user data attribute...[0;32m ✓[0m
-    ##  Checking the header
-    ##   - Checking header completeness...[0;32m ✓[0m
-    ##   - Checking scale factor validity...[0;32m ✓[0m
-    ##   - Checking point data format ID validity...[0;32m ✓[0m
-    ##   - Checking extra bytes attributes validity...[0;32m ✓[0m
-    ##   - Checking the bounding box validity...[0;32m ✓[0m
-    ##   - Checking coordinate reference system...[0;32m ✓[0m
-    ##  Checking header vs data adequacy
-    ##   - Checking attributes vs. point format...[0;32m ✓[0m
-    ##   - Checking header bbox vs. actual content...[0;32m ✓[0m
-    ##   - Checking header number of points vs. actual content...[0;32m ✓[0m
-    ##   - Checking header return number vs. actual content...[0;32m ✓[0m
-    ##  Checking coordinate reference system...
-    ##   - Checking if the CRS was understood by R...[0;32m ✓[0m
-    ##  Checking preprocessing already done 
-    ##   - Checking ground classification...[0;32m yes[0m
-    ##   - Checking normalization...[1;33m maybe[0m
-    ##   - Checking negative outliers...
-    ##  [1;33m   ⚠ 127086 points below 0[0m
-    ##   - Checking flightline classification...[0;32m yes[0m
-    ##  Checking compression
-    ##   - Checking attribute compression...
-    ##    -  Synthetic_flag is compressed
-    ##    -  Keypoint_flag is compressed
-    ##    -  Withheld_flag is compressed
-    ##    -  Overlap_flag is compressed
-    ##    -  UserData is compressed
 
 ``` r
 summary(todo.botanico.norm$Z)
@@ -170,12 +123,15 @@ summary(todo.botanico.norm$Z)
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     ##  -3.934   0.000   1.001   5.593  10.517  47.398
 
-La nueva descriptiva muestra un valor mínimo negativo. Dado que en los
-valores no normalizados de altura no había valores menores de 0, los
-valores normalizados negativos son artefactos de la triangulación (asumo
-que debidos a bajas densidades de puntos “suelo”). Podemos prescindir de
-esos artefactos filtrando los valores de altura de la nube de puntos
-normalizada. Eso hace la función `filter_poi()`:
+La nueva descriptiva de las alturas Z muestra un valor mínimo negativo.
+Dado que en los valores no normalizados de altura no había valores
+menores de 0, los valores normalizados negativos son artefactos de la
+triangulación (asumo que debidos a bajas densidades de puntos “suelo”).
+Podemos prescindir de esos artefactos filtrando los valores de altura de
+la nube de puntos normalizada. Eso hace la función `filter_poi()`. La
+visualización de la nube de puntos normalizada con `plot()` mostraría
+ahora la vegetación sobre una “llanura perfecta” (no incluyo ese plot
+aquí, sí el código):
 
 ``` r
 todo.botanico.norm <- filter_poi(todo.botanico.norm, Z >= 0)
@@ -187,11 +143,12 @@ todo.botanico.norm <- filter_poi(todo.botanico.norm, Z >= 0)
 A continuación elaboramos un modelo de altura del dosel. Será una
 cobertura [en formato
 ráster](https://docs.qgis.org/3.28/es/docs/gentle_gis_introduction/raster_data.html)
-representando los puntos más altos de los retornos LiDAR, la altura del
-dosel. Hay varios algoritmos posibles para obtener esos modelos; el
-código a continuación usa **point to raster**, especificado en`p2r()`,
-donde el argumento`subcircle = 0.2\` reemplaza cada dato LiDAR puntua
-con un disco de radio conocido (20 cm), minimizando los blancos:
+representando los puntos más altos en cada pixel de los retornos LiDAR,
+la altura del dosel. Hay varios algoritmos posibles para obtener esos
+modelos; el código a continuación usa **point to raster**, especificado
+en`p2r()`, donde el argumento`subcircle = 0.2\` reemplaza cada dato
+LiDAR con un disco de radio conocido (20 cm), minimizando así los
+huecos:
 
 ``` r
 dosel.modelo <- rasterize_canopy(todo.botanico.norm, res=1, p2r(subcircle = 0.2), pkg="terra")
@@ -200,14 +157,14 @@ plot(dosel.modelo, col = height.colors(50))
 
 ![](code_lidar_copas_botanico_files/figure-gfm/modelo%20dosel-1.png)<!-- -->
 
-### Suavizado del modelo - rellenando blancos
+### Suavizado del modelo del dosel - rellenando blancos
 
-A continuación procesamos el modelo de altura del dosel para suavizarlo,
-y rellenar los blancos restantes. Las dos primeras líneas de código a
-continuación definen la función de suavizado, mientras que la 3ª lo
-lleva a cabo a través de la librería de manipulación ráster **terra**.
-La última línea exporta el ráster a un archivo GeoTiff - también vía
-**terra** - dejándolo disponible para usos en GIS:
+A continuación procesamos el modelo de altura del dosel para rellenar
+los blancos restantes. Las dos primeras líneas de código a continuación
+definen la función de suavizado, mientras que la 3ª lo lleva a cabo a
+través de la librería de manipulación ráster **terra**. La última línea
+exporta el ráster a un archivo GeoTiff - también vía **terra** -
+dejándolo disponible para usos en GIS:
 
 ``` r
 fill.na <- function(x, i=5) { if (is.na(x)[i]) { return(mean(x, na.rm = TRUE)) } 
@@ -224,20 +181,19 @@ para *individualizar* árboles y arbustos de la nube de puntos LiDAR. Es
 el cometido de la función `locate_trees()`:
 
 ``` r
-copas.p2r.02 <- locate_trees(dosel.modelo.suave, lmf(ws = 10))
-## plot(dosel.modelo.suave, col = height.colors(50))
-## plot(sf::st_geometry(copas.p2r.02), add = TRUE, pch = 3)
+copas.p2r.02 <- locate_trees(dosel.modelo.suave, lmf(ws = 10))  
 ```
 
 ### Segmentación de los árboles detectados
 
-Hasta aquí tenemos un modelo de la posición de los árboles individuales
-a partir del modelo del dosel. A continuación podemos segmentar la nube
-de puntos normalizada, **todo_botanico_norm**, asignando un
-identificador individual a los puntos correspondientes a un árbol o
-arbusto concreto. De eso se encarga la función `segment_trees()`, que
-puede admitir distintos procedimientos para cumplir el cometido. El
-código a continuación usa uno de ellos, `dalponte2016()`:
+Hasta aquí hemos construido un modelo de la posición de árboles
+individuales en la nube de puntos, a partir del modelo del dosel. A
+continuación podemos segmentar la nube de puntos normalizada,
+**todo_botanico_norm**, asignando un identificador individual a los
+puntos correspondientes a un árbol o arbusto concreto. De eso se encarga
+la función `segment_trees()`, que admite distintos algoritmos para
+cumplir el cometido. El código a continuación usa uno de ellos,
+`dalponte2016()`:
 
 ``` r
 segmentos <- dalponte2016(dosel.modelo.suave, copas.p2r.02)
@@ -246,7 +202,10 @@ copas <- segment_trees (todo.botanico.norm, segmentos)
 
 La nube de puntos segmentada **copas** incluye algunas estructuras no
 identificadas como árboles válidos. A continuación nos quedamos solo con
-aquellos puntos que incorporan un identificador *árbol* válido:
+aquellos puntos que incorporan un identificador *árbol* válido. El
+resumen `summary()` indica na altura media de 9.3 m, y sugiere que el
+árbol más alto del Botánico mide - medía en el momento de tomar los
+datos - 47 m:
 
 ``` r
 arboles <- filter_poi(copas, !is.na(treeID))
@@ -268,29 +227,26 @@ alt="Árboles individualizados" />
 
 ### Extrayendo árboles individuales
 
-De la nube de puntos de árboles individualizados podemos extraer si es
-útil - o divertido - la nube de puntos de un modelo de un árbol
+De la nube de puntos de árboles individualizados podemos extraer - si es
+útil y/o divertido - la nube de puntos correspondiente a un árbol
 concreto. A continuación ilustro esto a partir del árbol más alto del
 modelo del Botánico, un *Eucalyptus globulus* de 47 m:
 
 ``` r
 okaliton <- filter_poi(arboles, treeID == 747)
-plot(okaliton, size = 6, bg = "black")
+plot(okaliton, size = 5, bg = "black")
 ```
 
-<figure>
-<img src="code_lidar_copas_botanico_files/figure-gfm/rgl_okaliton.png"
-alt="Nube de puntos correspondiente al gran Eucaliptus globulus situado al SE del Botánico" />
-<figcaption aria-hidden="true">Nube de puntos correspondiente al gran
-Eucaliptus globulus situado al SE del Botánico</figcaption>
-</figure>
+![Nube de puntos correspondiente al gran *Eucaliptus globulus* situado
+al SE del
+Botánico](code_lidar_copas_botanico_files/figure-gfm/rgl_okaliton.png).
 
 Una vez extraidos, esos modelos individuales de árboles son nubes de
 datos, de las que podemos extraer información de la manera habitual:
 `summary()` nos puede devolver información sobre la propia nube de
 puntos, y sobre variables concretas en ella, como la altura (Z). Una
 información relevante para evaluar la capacidad de los datos es la
-densidad de puntos por m<sup>2</sup>:
+densidad de puntos y pulsos por m<sup>2</sup>:
 
 ``` r
 ## summary(okaliton)
@@ -306,8 +262,8 @@ summary(okaliton@data$Z)
 
 La función `crown_metrics()` devuelve métricas de árboles (copas)
 individuales. La función incluye al menos dos argumentos - la nube de
-puntos de interés, y la función a extraer; en este primer caso, la media
-de altura de cada árbol:
+puntos de interés, y la función a extraer; a continuación *pedimos* la
+altura media de cada árbol:
 
 ``` r
 Z.media.arbol <- crown_metrics(arboles, func = ~mean(Z))
@@ -337,7 +293,7 @@ head(Z.media.arbol)
     ## 6     10 POINT Z (288175.9 4822120 4...  3.594292
 
 De la misma forma obtenemos la altura máxima, la desviación estándar de
-Z, y el número de retornos de los pusos LiDAR por cada árbol, como
+Z, y el número de retornos de los pulsos LiDAR por cada árbol, como
 medidas relacionadas con la **complejidad estructural** de la
 vegetación:
 
@@ -397,14 +353,13 @@ librería **lidR** incluye la función `plot_metrics()` para facilitar la
 extracción de métricas *tipo inventario*. La función requiere
 especificar la nube de puntos LiDAR, las métricas que queremos extraer,
 la localización de las parcelas, y el radio de las mismas. La nube de
-puntos aquí es la de la vegetación normalizada, y sin incluir
-segmentación en árboles individuales (i.e. **todo_botanico_norm**).
+puntos aquí es la de la vegetación normalizada, sin incluir segmentación
+en árboles individuales (i.e. **todo_botanico_norm**).
 
 Para manejar la localización de las parcelas, importamos una capa de
 puntos, en este caso 4; el formato utilizado es el viejo formato
-vectorial *shapefile* (extensión *shp*), disponible en
-[parcelas.zip](https://github.com/quevedomario/dosel-botanico/tree/main)
-en este repositorio:
+vectorial *shapefile* (extensión *shp*), disponible como .zip [en este
+repositorio](https://github.com/quevedomario/dosel-botanico/tree/main):
 
 ``` r
 parcelas <- sf::st_read("parcelas.shp", quiet = TRUE)
