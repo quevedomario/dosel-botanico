@@ -13,8 +13,8 @@ territorio ocupado por el [Jardín Botánico Atlántico de
 Gijón](https://www.gijon.es/es/directorio/jardin-botanico-atlantico-de-gijon)
 
 Los datos necesarios para desarrollar el ejemplo salen de tres archivos
-*.laz*: nubes de puntos LiDAR 3D, [descargados del
-IGN](https://centrodedescargas.cnig.es/CentroDescargas/busquedaSerie.do?codSerie=MLID2#).
+*.laz*: nubes de puntos LiDAR 3D, [descargados del IGN, LiDAR 2ª
+cobertura](http://centrodedescargas.cnig.es/CentroDescargas/buscadorCatalogo.do?codFamilia=LIDAR#).
 Cada archivo cubre 2 x 2 km, e incorporan coloración verdadera (RGB)
 derivada de las ortofotos. Están incluidos [en la carpeta comprimida
 2catalog_botanico.zip](https://www.dropbox.com/scl/fi/keaer5i67xc6p8toqna9d/2catalog_botanico.zip?rlkey=eb3tmq74au5i71wx3pnnrstdk&dl=0).
